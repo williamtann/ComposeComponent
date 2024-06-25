@@ -31,6 +31,9 @@ import kotlinx.coroutines.launch
 
 data class Item(val id: Int, val text: String)
 
+private const val CONTENT_TYPE_STICKY = "CONTENT_TYPE_STICKY"
+private const val CONTENT_TYPE_TEXT = "CONTENT_TYPE_TEXT"
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CustomList() {
@@ -72,9 +75,12 @@ fun CustomList() {
         verticalArrangement = Arrangement.spacedBy(12.dp),
         state = listState
     ) {
+        /**
+         * we can create a sticky list item with [stickyHeader]
+         */
         stickyHeader(
             key = "first sticky",
-            contentType = "sticky"
+            contentType = CONTENT_TYPE_STICKY
         ) {
             Text(
                 modifier = Modifier
@@ -95,28 +101,42 @@ fun CustomList() {
                 text = "This is a sticky header"
             )
         }
+
+        /**
+         * although we only add a single item, we still have to wrap it with [item] first
+         */
         item(
             key = "single item",
-            contentType = "text"
+            contentType = CONTENT_TYPE_TEXT
         ) {
             Text(text = "This is an item")
         }
-        items(itemList, key = { item ->
-            "items ${item.id}"
-        }, contentType = {
-            "text"
-        }) { item ->
+
+        /**
+         * we can create a list of items by passing the list of object or variables
+         */
+        items(
+            itemList,
+            key = { item -> "items with list ${item.id}" },
+            contentType = { CONTENT_TYPE_TEXT }
+        ) { item ->
             Text(text = item.text)
         }
+
+        /**
+         * similar with above, but [itemsIndexed] will also provide us with the index value
+         * of each list item
+         */
         itemsIndexed(itemList, key = { _, item ->
             "itemsIndexed ${item.id}"
         }, contentType = { _, _ ->
-            "text"
+            CONTENT_TYPE_TEXT
         }) { index, item ->
             Text(text = "Index: $index, value: ${item.text}")
         }
+
         stickyHeader(
-            contentType = "sticky"
+            contentType = CONTENT_TYPE_STICKY
         ) {
             Text(
                 modifier = Modifier
@@ -126,7 +146,15 @@ fun CustomList() {
                 text = "This is another sticky header"
             )
         }
-        items(100) { index ->
+
+        /**
+         * we can also create a list of items by passing the size of the list
+         */
+        items(
+            100,
+            key = { index -> "items with count $index" },
+            contentType = { CONTENT_TYPE_TEXT }
+        ) { index ->
             Text(text = "Items with index: $index")
         }
     }
